@@ -1,8 +1,7 @@
-# kahoot-clone=express
+# kahoot-clone-express
 
-Kahoot clone using React, Node.js and Socket.io.
-Works well with
-
+Kahoot clone using Node.js, Sequelize and Socket.io.
+Works well with with https://github.com/gregra81/kahoot-react
 
 ## Installation
 ```
