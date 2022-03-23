@@ -1,8 +1,8 @@
 const Question = require('../entity/question');
 
-function fromDbToEntity(question, answersJson) {
+function fromDbToEntity(question, mappedAnswers) {
   const { id, fk_trivia: triviaId, description } = question.toJSON();
-  return new Question({ id, triviaId, description, answersJson });
+  return new Question({ id, triviaId, description, mappedAnswers });
 }
 
 module.exports = {
