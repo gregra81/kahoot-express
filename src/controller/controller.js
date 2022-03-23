@@ -34,8 +34,14 @@ module.exports = class KahootController {
     });
 
     app.post('/trivialist/:triviaId/question', async (req, res) => {
-      const question = await this.kahootService.createQuestion(req.params.triviaId, req.body.question, req.body.answers);
-      res.json({ question });
+      try {
+        const question = await this.kahootService.createQuestion(req.params.triviaId, req.body.question, req.body.answers);
+        res.json({ question });
+      } catch (err) {
+        console.log(err)
+        res.status(400).json(err)
+      }
+
     });
 
     app.post('/trivialist/:triviaId/questionsAndAnswers', async (req, res) => {

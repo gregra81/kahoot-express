@@ -3,6 +3,7 @@
 /* eslint-disable no-param-reassign */
 
 const { getContacts } = require('../lib/bizzaboClient');
+const ClientError = require("../entity/ClientError");
 
 module.exports = class KahootService {
   constructor(kahootRepository) {
@@ -30,6 +31,7 @@ module.exports = class KahootService {
   }
 
   async createQuestion(triviaId, question, answers) {
+    this.validateAnswers(answers)
     const questionRes = await this.kahootRepository.createQuestion(triviaId, question, answers);
     return questionRes;
   }
@@ -57,7 +59,29 @@ module.exports = class KahootService {
   }
 
   async updateAnswer(triviaId, questionId, answerId, answer) {
+    const answers = await this.kahootRepository.getQuestionAnswers(questionId)
+    this.validateAnswer(answers, answer)
     await this.kahootRepository.updateAnswer(triviaId, questionId, answerId, answer);
+  }
+
+  validateAnswers(answers){
+    if(answers.length !== 4){
+      throw new ClientError('You should Provide exactly 4 answers', 400)
+    }
+    let count = 1;
+    for (const answer in answers ) {
+      if(answers[answer].is_correct){
+        count++
+      }
+    }
+    if(count !== 1){
+      throw new ClientError('You should Provide exactly 1 ')
+    }
+  }
+
+  validateAnswer(answers, answer) {
+    answers[answer].is_correct = answer.is_correct
+    this.validateAnswers(answers)
   }
 
   configureMiniPodium(namespace, options) {
