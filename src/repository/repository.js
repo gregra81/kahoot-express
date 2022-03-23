@@ -1,9 +1,12 @@
 const { Sequelize, QueryTypes } = require('sequelize');
 const { fromDbToEntity: fromTriviaDbToEntity } = require('../mapper/triviaMapper');
-const { fromDbToEntity: fromGameDbToEntity, fromDbToEntity} = require('../mapper/gameMapper');
+const { fromDbToEntity: fromGameDbToEntity} = require('../mapper/gameMapper');
 const { fromDbToEntity: fromPlayerDbToEntity } = require('../mapper/playerMapper');
 const { fromDbToEntity: fromPlayerAnswerDbToEntity } = require('../mapper/playerAnswerMapper');
-const {fromDbToEntity: fromDbToEntityWithAnswer} = require("../mapper/questionMapper");
+const {fromDbToEntityWithAnswer: fromQuestionToEntityWithAnswer} = require("../mapper/questionMapper");
+const {fromDbToEntity: fromQuestionToEntity} = require("../mapper/questionMapper");
+const {fromDbToEntities: fromAnswerDbToEntities} = require("../mapper/answerMapper");
+const { fromDbToEntity: fromDbToAnswerEntity } = require('../mapper/answerMapper');
 
 
 module.exports = class KahootRepository {
@@ -65,6 +68,22 @@ module.exports = class KahootRepository {
     return fromTriviaDbToEntity(triviaData);
   }
 
+  async getQuestionAnswers(questionId) {
+    const answerData = await this.QuestionModel.findByPk(questionId, {
+      attributes: ['id', 'fk_trivia', 'description'],
+      include: [
+        {
+          model: this.AnswerModel,
+          where: {
+            fk_trivia: questionId,
+          },
+          attributes: ['id', 'description', 'fk_question', 'is_correct'],
+        },
+      ],
+    });
+    return fromAnswerDbToEntities(answerData)
+  }
+
   async createQuestion(triviaId, question, answers) {
     const questionData = await this.QuestionModel.create({
       fk_trivia: triviaId,
@@ -78,9 +97,18 @@ module.exports = class KahootRepository {
         is_correct: answers[answer].is_correct,
         fk_question: questionData.dataValues.id
       });
-      answersDataJson.push(fromDbToEntity(answerData.toJSON()))
+      answersDataJson.push(fromDbToAnswerEntity(answerData.toJSON()))
     }
-    return fromDbToEntityWithAnswer(questionData, answersDataJson);
+    return fromQuestionToEntityWithAnswer(questionData, answersDataJson);
+  }
+
+  async updateQuestion(triviaId, questionId, question) {
+    await this.QuestionModel.update({
+      fk_trivia: triviaId,
+      description: question.description,
+    },{
+      where: {id: questionId}
+    });
   }
 
   async saveGame(game) {

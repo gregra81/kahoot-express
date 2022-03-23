@@ -41,6 +41,10 @@ module.exports = class KahootController {
       const question = await this.kahootService.createQuestion(req.params.triviaId, req.body.question, req.body.answers);
       res.json({ question });
     });
+    app.patch('/trivialist/:triviaId/question/:questionId', async (req, res) => {
+      const question = await this.kahootService.updateQuestion(req.params.triviaId, req.params.questionId, req.body.question, req.body.answers);
+      res.json({ question });
+    });
 
     app.get('/*', (req, res) => {
       res.sendFile(this.path.join(__dirname, '../../build', 'index.html'));
