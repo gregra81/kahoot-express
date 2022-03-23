@@ -66,7 +66,7 @@ module.exports = class KahootRepository {
         is_correct: answers[answer].is_correct,
         fk_question: questionData.dataValues.id
       });
-      answersDataJson.push(fromDbToAnswerEntity(answerData))
+      answersDataJson.push(fromDbToAnswerEntity(answerData.toJSON()))
     }
     return fromQuestionDbToEntity(questionData, answersDataJson);
   }
