@@ -8,6 +8,11 @@ module.exports = class KahootController {
   }
 
   configureRoutes(app, io) {
+    app.post('/trivia/', async (req, res) => {
+      const trivia = await this.kahootService.createTrivia(req.body);
+      res.json({ trivia });
+    });
+
     app.get('/trivia/:accountId/:eventId/:sessionId', async (req, res) => {
       const { accountId, eventId, sessionId } = req.params;
       const trivia = await this.kahootService.getTriviaIdForSession(accountId, eventId, sessionId);
@@ -39,7 +44,7 @@ module.exports = class KahootController {
         res.json({ question });
       } catch (err) {
         console.log(err)
-        res.status(400).json(err)
+        res.status(err.statusCode).json(err.message)
       }
 
     });

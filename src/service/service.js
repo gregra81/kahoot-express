@@ -10,6 +10,11 @@ module.exports = class KahootService {
     this.kahootRepository = kahootRepository;
   }
 
+  async createTrivia(body){
+    const trivia = await this.kahootRepository.createTrivia(body.name);
+    return trivia;
+  }
+
   async getTriviaById(id) {
     const trivia = await this.kahootRepository.getTriviaById(id);
     return trivia;
@@ -37,10 +42,8 @@ module.exports = class KahootService {
   }
 
   async createQuestions(triviaId, bodies) {
-    console.log(bodies)
     const questionsRes = []
     for(const body in bodies) {
-      console.log(bodies[body])
       // eslint-disable-next-line no-await-in-loop
       const questionRes = await this.kahootRepository.createQuestion(triviaId, bodies[body].question, bodies[body].answers);
       questionsRes.push(questionRes)

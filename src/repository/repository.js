@@ -29,6 +29,13 @@ module.exports = class KahootRepository {
     this.PlayerAnswerModel = PlayerAnswerModel;
   }
 
+  async createTrivia(triviaName) {
+    const trivia = await this.TriviaModel.create({
+      name: triviaName,
+    });
+    return fromTriviaDbToEntity(trivia);
+  }
+
   async getTriviaIdForSession(accountId, eventId, sessionId) {
     const session = await this.SessionModel.findOne({ where: { accountId, eventId, sessionId } });
     return session ? session.fk_trivia : 0;
