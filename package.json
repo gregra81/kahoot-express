@@ -1,0 +1,42 @@
+{
+  "name": "kahoot-clone",
+  "version": "1.0.0",
+  "description": "",
+  "main": "server.js",
+  "repository": {
+    "url": "https://github.com/r-argentina-programa/kahoot-clone"
+  },
+  "scripts": {
+    "start": "node server.js",
+    "migrations": "sequelize-cli db:migrate --config=./src/cli/config.js --migrations-path=./src/cli/migrations --env=development",
+    "seeds": "sequelize-cli db:seed:all --config=./src/cli/config.js --seeders-path=./src/cli/seeders --env=development",
+    "test": "jest --coverage",
+    "test:dev": "jest --watch"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "connect-session-sequelize": "^7.0.4",
+    "dotenv": "^8.2.0",
+    "express": "^4.17.1",
+    "express-session": "^1.17.1",
+    "pg": "^8.4.1",
+    "pg-hstore": "^2.3.3",
+    "rsdi": "^1.0.9",
+    "sequelize": "^6.3.5",
+    "socket.io": "^2.3.0",
+    "sqlite3": "^5.0.0",
+    "uuid": "^8.3.1"
+  },
+  "devDependencies": {
+    "@types/jest": "^26.0.15",
+    "eslint": "^7.12.1",
+    "eslint-config-airbnb-base": "^14.2.0",
+    "eslint-config-prettier": "^6.15.0",
+    "eslint-plugin-import": "^2.22.1",
+    "eslint-plugin-jest": "^24.1.0",
+    "jest": "^26.6.1",
+    "prettier": "2.1.2",
+    "sequelize-cli": "^6.2.0"
+  }
+}
