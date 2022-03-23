@@ -3,6 +3,9 @@ const { fromDbToEntity: fromTriviaDbToEntity } = require('../mapper/triviaMapper
 const { fromDbToEntity: fromGameDbToEntity } = require('../mapper/gameMapper');
 const { fromDbToEntity: fromPlayerDbToEntity } = require('../mapper/playerMapper');
 const { fromDbToEntity: fromPlayerAnswerDbToEntity } = require('../mapper/playerAnswerMapper');
+const {fromDbToEntity: fromQuestionDbToEntity} = require("../mapper/questionMapper");
+const { fromDbToEntity: fromDbToAnswerEntity } = require('../mapper/answerMapper');
+
 
 module.exports = class KahootRepository {
   /**
@@ -48,6 +51,24 @@ module.exports = class KahootRepository {
       ],
     });
     return fromTriviaDbToEntity(triviaData);
+  }
+
+  async createQuestion(triviaId, question, answers) {
+    const questionData = await this.QuestionModel.create({
+      fk_trivia: triviaId,
+      description: question.description,
+    });
+    const answersDataJson = []
+    for(const answer in answers) {
+      // eslint-disable-next-line no-await-in-loop
+      const answerData = await this.AnswerModel.create({
+        description: answers[answer].description,
+        is_correct: answers[answer].is_correct,
+        fk_question: questionData.dataValues.id
+      });
+      answersDataJson.push(fromDbToAnswerEntity(answerData))
+    }
+    return fromQuestionDbToEntity(questionData, answersDataJson);
   }
 
   async saveGame(game) {

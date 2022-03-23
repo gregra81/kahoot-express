@@ -2,12 +2,14 @@ require('dotenv').config({ path: `${__dirname}/.env` });
 
 const path = require('path');
 const express = require('express');
+const bodyParser = require('body-parser');
 const socketIO = require('socket.io');
 const { initKahootModule } = require('./src/module');
 const configureDI = require('./src/config/di');
 
 const PORT = process.env.PORT || 3030;
 const app = express();
+app.use(bodyParser.json({ extended: true }))
 const server = app.listen(PORT, () => console.log(`Listening on ${PORT}`));
 const io = socketIO(server);
 
