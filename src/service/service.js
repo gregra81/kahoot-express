@@ -34,6 +34,18 @@ module.exports = class KahootService {
     return questionRes;
   }
 
+  async createQuestions(triviaId, bodies) {
+    console.log(bodies)
+    const questionsRes = []
+    for(const body in bodies) {
+      console.log(bodies[body])
+      // eslint-disable-next-line no-await-in-loop
+      const questionRes = await this.kahootRepository.createQuestion(triviaId, bodies[body].question, bodies[body].answers);
+      questionsRes.push(questionRes)
+    }
+    return questionsRes;
+  }
+
   async updateQuestion(triviaId, questionId, question, answers) {
     const questionRes = await this.kahootRepository.updateQuestion(triviaId, questionId, question, answers);
     return questionRes;
