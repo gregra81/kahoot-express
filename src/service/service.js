@@ -2,6 +2,8 @@
 /* eslint-disable no-plusplus */
 /* eslint-disable no-param-reassign */
 
+const { getContacts } = require('../lib/bizzaboClient');
+
 module.exports = class KahootService {
   constructor(kahootRepository) {
     this.kahootRepository = kahootRepository;
@@ -149,6 +151,21 @@ module.exports = class KahootService {
         score: socket.score,
       });
     }
+  }
+
+  async getPlayer(accountId, eventId, email) {
+    if (accountId && eventId && email) {
+      try {
+        const contactsData = await getContacts(parseInt(accountId), parseInt(eventId));
+
+        const contactsWithProps = contactsData.data.content.map(contact => ({ id: contact.id, eventId: contact.eventId, ...contact.properties }));
+        const currentUser = contactsWithProps.filter(contact => contact.email === email).pop();
+        return { playerName: `${currentUser.firstName} ${currentUser.lastName}`};
+      } catch (error) {
+        // do nothing
+      }
+    }
+    return { playerName: 'Anonymous' };
   }
 
   getAllSockets(namespace) {

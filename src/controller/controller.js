@@ -14,10 +14,6 @@ module.exports = class KahootController {
       res.json({ trivia, pin: sessionId });
     });
 
-    app.get('/player/:accountId/:eventId/:userId', async (req, res) => {
-      res.json({ playerName: 'Test user', isHost: true }); // TODO: replace with actual data
-    });
-
     app.get('/trivialist', async (req, res) => {
       const trivias = await this.kahootService.getAllTrivias();
       const pin = Math.floor(Math.random() * 1000000);
@@ -52,6 +48,11 @@ module.exports = class KahootController {
     app.patch('/trivialist/:triviaId/question/:questionId/answer/:answerId', async (req, res) => {
       const answer = await this.kahootService.updateAnswer(req.params.triviaId, req.params.questionId, req.params.answerId, req.body.answer);
       res.json({ answer });
+    });
+
+    app.get('/player', async (req, res) => {
+      const player = await this.kahootService.getPlayer(req.query.accountId, req.query.eventId, req.query.email);
+      res.json(player);
     });
 
     app.get('/*', (req, res) => {
