@@ -1,6 +1,8 @@
 /* eslint-disable class-methods-use-this */
 /* eslint-disable no-param-reassign */
 
+const { getContacts } = require('../lib/bizzaboClient');
+
 module.exports = class KahootController {
   constructor(kahootService, path) {
     this.kahootService = kahootService;
@@ -46,11 +48,32 @@ module.exports = class KahootController {
       res.json({ question });
     });
 
+    app.get('/player', async (req, res) => {
+      const player = await this.getPlayer(req.query.accountId, req.query.eventId, req.query.email);
+      res.json(player);
+    });
+
     app.get('/*', (req, res) => {
       res.sendFile(this.path.join(__dirname, '../../build', 'index.html'));
     });
 
   }
+
+  async getPlayer(accountId, eventId, email) {
+    if (accountId && eventId && email) {
+      try {
+        const contactsData = await getContacts(parseInt(accountId), parseInt(eventId));
+
+        const contactsWithProps = contactsData.data.content.map(contact => ({ id: contact.id, eventId: contact.eventId, ...contact.properties }));
+        const currentUser = contactsWithProps.filter(contact => contact.email === email).pop();
+        return { playerName: `${currentUser.firstName} ${currentUser.lastName}`};
+      } catch (error) {
+        // do nothing
+      }
+    }
+    return { playerName: 'Anonymous' };
+  }
+
 
   setNamespaceConnection(namespace, callback) {
     namespace.on('connection', callback);
