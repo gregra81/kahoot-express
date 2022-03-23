@@ -1,8 +1,6 @@
 /* eslint-disable class-methods-use-this */
 /* eslint-disable no-param-reassign */
 
-const { getContacts } = require('../lib/bizzaboClient');
-
 module.exports = class KahootController {
   constructor(kahootService, path) {
     this.kahootService = kahootService;
@@ -14,10 +12,6 @@ module.exports = class KahootController {
       const { accountId, eventId, sessionId } = req.params;
       const trivia = await this.kahootService.getTriviaIdForSession(accountId, eventId, sessionId);
       res.json({ trivia, pin: sessionId });
-    });
-
-    app.get('/player/:accountId/:eventId/:userId', async (req, res) => {
-      res.json({ playerName: 'Test user', isHost: true }); // TODO: replace with actual data
     });
 
     app.get('/trivialist', async (req, res) => {
@@ -49,7 +43,7 @@ module.exports = class KahootController {
     });
 
     app.get('/player', async (req, res) => {
-      const player = await this.getPlayer(req.query.accountId, req.query.eventId, req.query.email);
+      const player = await this.kahootService.getPlayer(req.query.accountId, req.query.eventId, req.query.email);
       res.json(player);
     });
 
@@ -58,22 +52,6 @@ module.exports = class KahootController {
     });
 
   }
-
-  async getPlayer(accountId, eventId, email) {
-    if (accountId && eventId && email) {
-      try {
-        const contactsData = await getContacts(parseInt(accountId), parseInt(eventId));
-
-        const contactsWithProps = contactsData.data.content.map(contact => ({ id: contact.id, eventId: contact.eventId, ...contact.properties }));
-        const currentUser = contactsWithProps.filter(contact => contact.email === email).pop();
-        return { playerName: `${currentUser.firstName} ${currentUser.lastName}`};
-      } catch (error) {
-        // do nothing
-      }
-    }
-    return { playerName: 'Anonymous' };
-  }
-
 
   setNamespaceConnection(namespace, callback) {
     namespace.on('connection', callback);
