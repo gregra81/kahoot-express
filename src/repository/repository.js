@@ -7,6 +7,7 @@ const {fromDbToEntityWithAnswer: fromQuestionToEntityWithAnswer} = require("../m
 const {fromDbToEntity: fromQuestionToEntity} = require("../mapper/questionMapper");
 const {fromDbToEntities: fromAnswerDbToEntities} = require("../mapper/answerMapper");
 const { fromDbToEntity: fromDbToAnswerEntity } = require('../mapper/answerMapper');
+const { fromDbToEntity: fromSessionDbToEntity } = require('../mapper/sessionMapper');
 
 
 module.exports = class KahootRepository {
@@ -39,6 +40,16 @@ module.exports = class KahootRepository {
   async getTriviaIdForSession(accountId, eventId, sessionId) {
     const session = await this.SessionModel.findOne({ where: { accountId, eventId, sessionId } });
     return session ? session.fk_trivia : 0;
+  }
+
+  async connectTriviaToSession(accountId, eventId, sessionId, triviaId) {
+    const connect = await this.SessionModel.create({
+      accountId,
+      eventId,
+      sessionId,
+      fk_trivia: triviaId,
+    });
+    return fromSessionDbToEntity(connect)
   }
 
   async getTriviaForSession(accountId, eventId, sessionId) {
