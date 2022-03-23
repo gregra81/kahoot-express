@@ -37,6 +37,15 @@ module.exports = class KahootService {
     return questionRes;
   }
 
+  async createAnswer(triviaId, questionId, answer) {
+    const answerRes = await this.kahootRepository.createAnswer(triviaId, questionId, answer);
+    return answerRes;
+  }
+
+  async updateAnswer(triviaId, questionId, answerId, answer) {
+    await this.kahootRepository.updateAnswer(triviaId, questionId, answerId, answer);
+  }
+
   configureMiniPodium(namespace, options) {
     namespace.miniPodium = options.map((option) => {
       return { option: option.id, count: 0 };

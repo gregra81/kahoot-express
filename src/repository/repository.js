@@ -111,6 +111,25 @@ module.exports = class KahootRepository {
     });
   }
 
+  async createAnswer(triviaId, questionId, answer) {
+    const answerData = await this.AnswerModel.create({
+      description: answer.description,
+      is_correct: answer.is_correct,
+      fk_question: questionId
+    });
+    return fromDbToAnswerEntity(answerData.toJSON())
+  }
+
+  async updateAnswer(triviaId, questionId, answerId, answer) {
+    await this.AnswerModel.update({
+      description: answer.description,
+      is_correct: answer.is_correct,
+      fk_question: questionId,
+    },{
+      where: {id: answerId}
+    });
+  }
+
   async saveGame(game) {
     const gameData = await this.GameModel.create({
       fk_trivia: game.triviaId,
