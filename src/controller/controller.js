@@ -27,9 +27,15 @@ module.exports = class KahootController {
       res.json(stats);
     });
 
+    app.post('/trivialist/:triviaId/question', async (req, res) => {
+      const question = await this.kahootService.createQuestion(req.params.triviaId, req.body.question, req.body.answers);
+      res.json({ question });
+    });
+
     app.get('/*', (req, res) => {
       res.sendFile(this.path.join(__dirname, '../../build', 'index.html'));
     });
+
   }
 
   setNamespaceConnection(namespace, callback) {

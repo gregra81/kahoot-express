@@ -1,8 +1,10 @@
 const { Sequelize, QueryTypes } = require('sequelize');
 const { fromDbToEntity: fromTriviaDbToEntity } = require('../mapper/triviaMapper');
-const { fromDbToEntity: fromGameDbToEntity } = require('../mapper/gameMapper');
+const { fromDbToEntity: fromGameDbToEntity, fromDbToEntity} = require('../mapper/gameMapper');
 const { fromDbToEntity: fromPlayerDbToEntity } = require('../mapper/playerMapper');
 const { fromDbToEntity: fromPlayerAnswerDbToEntity } = require('../mapper/playerAnswerMapper');
+const {fromDbToEntity: fromDbToEntityWithAnswer} = require("../mapper/questionMapper");
+
 
 module.exports = class KahootRepository {
   /**
@@ -48,6 +50,24 @@ module.exports = class KahootRepository {
       ],
     });
     return fromTriviaDbToEntity(triviaData);
+  }
+
+  async createQuestion(triviaId, question, answers) {
+    const questionData = await this.QuestionModel.create({
+      fk_trivia: triviaId,
+      description: question.description,
+    });
+    const answersDataJson = []
+    for(const answer in answers) {
+      // eslint-disable-next-line no-await-in-loop
+      const answerData = await this.AnswerModel.create({
+        description: answers[answer].description,
+        is_correct: answers[answer].is_correct,
+        fk_question: questionData.dataValues.id
+      });
+      answersDataJson.push(fromDbToEntity(answerData.toJSON()))
+    }
+    return fromDbToEntityWithAnswer(questionData, answersDataJson);
   }
 
   async saveGame(game) {
