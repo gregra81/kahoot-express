@@ -39,8 +39,18 @@ const getContacts = async (accountId, eventId) => {
     }); 
 }
 
+const getSession = async (accountId, eventId, sessionId) => {
+    console.log(apiServer)
+    return await axios.get(`${apiServer}/v1/events/${eventId}/agenda/sessions/${sessionId}`, {
+        headers : {
+            'Authorization': `Bearer ${await getToken(accountId)}`
+        }
+    });
+}
+
 /** PUBLIC METHODS **/
 
 module.exports = {
-    getContacts
+    getContacts,
+    getSession
 }

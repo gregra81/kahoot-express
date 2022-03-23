@@ -14,6 +14,18 @@ module.exports = class KahootController {
       res.json({ trivia, pin: sessionId });
     });
 
+    app.post('/trivia/:triviaId', async (req, res) => {
+      try {
+        const trivia = await this.kahootService
+            .connectTriviaToSession(req.body.accountId, req.body.eventId, req.body.sessionId, req.params.triviaId);
+        res.json({ trivia });
+      } catch (err) {
+        console.log(err)
+        res.status(err.statusCode).json(err.message)
+      }
+
+    });
+
     app.get('/trivialist', async (req, res) => {
       const trivias = await this.kahootService.getAllTrivias();
       const pin = Math.floor(Math.random() * 1000000);
@@ -39,7 +51,7 @@ module.exports = class KahootController {
         res.json({ question });
       } catch (err) {
         console.log(err)
-        res.status(400).json(err)
+        res.status(err.statusCode).json(err.message)
       }
 
     });

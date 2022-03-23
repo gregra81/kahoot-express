@@ -2,7 +2,7 @@
 /* eslint-disable no-plusplus */
 /* eslint-disable no-param-reassign */
 
-const { getContacts } = require('../lib/bizzaboClient');
+const { getContacts, getSession } = require('../lib/bizzaboClient');
 const ClientError = require("../entity/ClientError");
 
 module.exports = class KahootService {
@@ -12,6 +12,14 @@ module.exports = class KahootService {
 
   async getTriviaById(id) {
     const trivia = await this.kahootRepository.getTriviaById(id);
+    return trivia;
+  }
+
+  async connectTriviaToSession(accountId, eventId, sessionId, triviaId) {
+    const session = await getSession(accountId, eventId, sessionId)
+    if(session === undefined)
+      throw new ClientError("the seesion is not found", 404)
+    const trivia = await this.kahootRepository.connectTriviaToSession(accountId, eventId, sessionId, triviaId);
     return trivia;
   }
 
