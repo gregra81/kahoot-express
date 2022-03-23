@@ -7,6 +7,7 @@ const { KahootController, KahootService, KahootRepository } = require('../module
 const AnswerModel = require('../model/answerModel');
 const QuestionModel = require('../model/questionModel');
 const TriviaModel = require('../model/triviaModel');
+const SessionModel = require('../model/sessionModel');
 const GameModel = require('../model/gameModel');
 const PlayerModel = require('../model/playerModel');
 const PlayerAnswerModel = require('../model/playerAnswerModel');
@@ -70,6 +71,14 @@ function configureTriviaModel(container) {
 /**
  * @param {DIContainer} container
  */
+function configureSessionModel(container) {
+  SessionModel.setup(container.get('Sequelize'));
+  return SessionModel;
+}
+
+/**
+ * @param {DIContainer} container
+ */
 function configureGameModel(container) {
   GameModel.setup(container.get('Sequelize'));
   GameModel.setupAssociations(container.get('PlayerModel'));
@@ -104,6 +113,7 @@ function addKahootDefinitions(container) {
       get('AnswerModel'),
       get('QuestionModel'),
       get('TriviaModel'),
+      get('SessionModel'),
       get('GameModel'),
       get('PlayerModel'),
       get('PlayerAnswerModel')
@@ -111,6 +121,7 @@ function addKahootDefinitions(container) {
     AnswerModel: factory(configureAnswerModel),
     QuestionModel: factory(configureQuestionModel),
     TriviaModel: factory(configureTriviaModel),
+    SessionModel: factory(configureSessionModel),
     GameModel: factory(configureGameModel),
     PlayerModel: factory(configurePlayerModel),
     PlayerAnswerModel: factory(configurePlayerAnswerModel),

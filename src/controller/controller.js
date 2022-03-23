@@ -8,6 +8,16 @@ module.exports = class KahootController {
   }
 
   configureRoutes(app, io) {
+    app.get('/trivia/:accountId/:eventId/:sessionId', async (req, res) => {
+      const { accountId, eventId, sessionId } = req.params;
+      const trivia = await this.kahootService.getTriviaIdForSession(accountId, eventId, sessionId);
+      res.json({ trivia, pin: sessionId });
+    });
+
+    app.get('/player/:accountId/:eventId/:userId', async (req, res) => {
+      res.json({ playerName: 'Test user', isHost: true }); // TODO: replace with actual data
+    });
+
     app.get('/trivialist', async (req, res) => {
       const trivias = await this.kahootService.getAllTrivias();
       const pin = Math.floor(Math.random() * 1000000);
