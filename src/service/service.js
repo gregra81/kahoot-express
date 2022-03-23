@@ -12,6 +12,16 @@ module.exports = class KahootService {
     return trivia;
   }
 
+  async getTriviaIdForSession(accountId, eventId, sessionId) {
+    const triviaId = await this.kahootRepository.getTriviaIdForSession(accountId, eventId, sessionId);
+    return triviaId;
+  }
+
+  async getTriviaForSession(accountId, eventId, sessionId) {
+    const trivia = await this.kahootRepository.getTriviaForSession(accountId, eventId, sessionId);
+    return trivia;
+  }
+
   async getAllTrivias() {
     const trivias = await this.kahootRepository.getAllTrivias();
     return trivias;

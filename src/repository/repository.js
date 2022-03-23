@@ -12,14 +12,27 @@ module.exports = class KahootRepository {
    * @param {typeof import('../model/playerModel')} PlayerModel
    * @param {typeof import('../model/questionModel')} QuestionModel
    * @param {typeof import('../model/triviaModel')} TriviaModel
+   * @param {typeof import('../model/sessionModel')} SessionModel
    */
-  constructor(AnswerModel, QuestionModel, TriviaModel, GameModel, PlayerModel, PlayerAnswerModel) {
+  constructor(AnswerModel, QuestionModel, TriviaModel, SessionModel, GameModel, PlayerModel, PlayerAnswerModel) {
     this.AnswerModel = AnswerModel;
     this.QuestionModel = QuestionModel;
     this.TriviaModel = TriviaModel;
+    this.SessionModel = SessionModel;
     this.GameModel = GameModel;
     this.PlayerModel = PlayerModel;
     this.PlayerAnswerModel = PlayerAnswerModel;
+  }
+
+  async getTriviaIdForSession(accountId, eventId, sessionId) {
+    const session = await this.SessionModel.findOne({ where: { accountId, eventId, sessionId } });
+    return session ? session.fk_trivia : 0;
+  }
+
+  async getTriviaForSession(accountId, eventId, sessionId) {
+    const triviaId = await this.getTriviaIdForSession(accountId, eventId, sessionId);
+    const trivia = this.getTriviaById(triviaId);
+    return trivia;
   }
 
   async getAllTrivias() {
