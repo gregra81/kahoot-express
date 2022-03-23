@@ -10,7 +10,6 @@ function initKahootModule(app, io, container) {
 module.exports = {
   initKahootModule,
   KahootController,
-  KahootQnAController,
   KahootService,
   KahootRepository,
 };

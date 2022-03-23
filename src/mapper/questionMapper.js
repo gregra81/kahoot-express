@@ -8,9 +8,9 @@ function fromDbToEntityWithAnswer(question, mappedAnswers) {
 }
 
 function fromDbToEntity(question) {
-  const {id, fk_trivia: triviaId, description, Answers: answers} = question;
+  const { id, fk_trivia: triviaId, description, Answers: answers } = question;
   const mappedAnswers = answers.map((answer) => fromDbToAnswerEntity(answer));
-  return new Question({id, triviaId, description, mappedAnswers});
+  return new Question({ id, triviaId, description, mappedAnswers });
 }
 
 module.exports = {
