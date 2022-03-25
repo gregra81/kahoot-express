@@ -1,4 +1,5 @@
 const axios = require('axios');
+const { getCacheInstance } = require('./cache');
 const clientId = process.env.BIZZABO_CLIENT_ID;
 const clientSecret = process.env.BIZZABO_CLIENT_SECRET;
 
@@ -7,6 +8,13 @@ const apiServer = process.env.API_SERVER;
 const audience = 'https://api.bizzabo.com/api';
 
 const getToken = async (accountId) => {
+    const cache = getCacheInstance();
+    const cacheKey = `token_${accountId}`;
+    const token = await cache.cacheGet(cacheKey);
+    if (token) {
+        console.log('Returning a cached token');
+        return token;
+    }    
     try {
         const oauthPayload = {
             grant_type: 'client_credentials',
@@ -21,6 +29,9 @@ const getToken = async (accountId) => {
         }
     
         const resp = await axios.post(`${issuerBaseUrl}/oauth/token`, oauthPayload);
+        // set expiry to the future and substract 5 minutes (300 sec) to be on the safe side
+        const expiration = (resp.data.expires_in / 60) - 5;
+        await cache.cacheSet(cacheKey, resp.data.access_token, expiration);
 
         return resp.data.access_token;
   
@@ -49,8 +60,38 @@ const getSession = async (accountId, eventId, sessionId) => {
 }
 
 /** PUBLIC METHODS **/
+/**
+ * Reyturn contacts and cache them so for the next calls we're getting
+ * cached data instead of hitting the Bizzabo APIs
+ * @param {*} accountId 
+ * @param {*} eventId 
+ * @param {*} cacheTime - in minutes
+ * @returns 
+ */
+const getContactsCached = async (accountId, eventId, cacheTime = 10) => {
+    const cache = getCacheInstance();
+    const cacheKey = `contacts_${eventId}`;
+    const contactsCached = await cache.cacheGet(cacheKey);
+    if (contactsCached) {
+        console.log(`Returning cached contacts for event ${eventId}`);
+        try {
+            return contactsCached;
+        } catch (e) {
+            console.error(`Couldn't parse JSON`);
+        }
+    }
+
+    const { error, data } = await getContacts(accountId, eventId);
+
+    if (!error) {
+        await cache.cacheSet(cacheKey, data.content, cacheTime);
+    }
+
+    return data.content;
+}
+
 
 module.exports = {
-    getContacts,
+    getContactsCached,
     getSession
 }
