@@ -69,9 +69,9 @@ const getSession = async (accountId, eventId, sessionId) => {
  */
 const getContactsCached = async (accountId, eventId, cacheTime = 10) => {
     const cachedContactsFunc = cachedApiCall(getContacts, cacheTime);
-    const contacts = await cachedContactsFunc(accountId, eventId);
+    const data = await cachedContactsFunc(accountId, eventId);
 
-    return contacts.content;
+    return data.content;
 }
 
 
