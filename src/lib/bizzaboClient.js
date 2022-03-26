@@ -1,5 +1,5 @@
 const axios = require('axios');
-const { getCacheInstance } = require('./cache');
+const { getCacheInstance, cachedApiCall } = require('./cache');
 const clientId = process.env.BIZZABO_CLIENT_ID;
 const clientSecret = process.env.BIZZABO_CLIENT_SECRET;
 
@@ -51,7 +51,6 @@ const getContacts = async (accountId, eventId) => {
 }
 
 const getSession = async (accountId, eventId, sessionId) => {
-    console.log(apiServer)
     return await axios.get(`${apiServer}/v1/events/${eventId}/agenda/sessions/${sessionId}`, {
         headers : {
             'Authorization': `Bearer ${await getToken(accountId)}`
@@ -69,25 +68,10 @@ const getSession = async (accountId, eventId, sessionId) => {
  * @returns 
  */
 const getContactsCached = async (accountId, eventId, cacheTime = 10) => {
-    const cache = getCacheInstance();
-    const cacheKey = `contacts_${eventId}`;
-    const contactsCached = await cache.cacheGet(cacheKey);
-    if (contactsCached) {
-        console.log(`Returning cached contacts for event ${eventId}`);
-        try {
-            return contactsCached;
-        } catch (e) {
-            console.error(`Couldn't parse JSON`);
-        }
-    }
+    const cachedContactsFunc = cachedApiCall(getContacts, cacheTime);
+    const contacts = await cachedContactsFunc(accountId, eventId);
 
-    const { error, data } = await getContacts(accountId, eventId);
-
-    if (!error) {
-        await cache.cacheSet(cacheKey, data.content, cacheTime);
-    }
-
-    return data.content;
+    return contacts.content;
 }
 
 

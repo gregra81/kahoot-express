@@ -207,7 +207,9 @@ module.exports = class KahootService {
 
         const contactsWithProps = contactsData.map(contact => ({ id: contact.id, eventId: contact.eventId, ...contact.properties }));
         const currentUser = contactsWithProps.filter(contact => contact.email === email).pop();
-        return { playerName: `${currentUser.firstName} ${currentUser.lastName}`};
+        if (currentUser) {
+          return { playerName: `${currentUser.firstName} ${currentUser.lastName}`};
+        }
       } catch (error) {
         // do nothing
         console.error(error);

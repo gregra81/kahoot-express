@@ -39,7 +39,6 @@ class Cache {
     }
 }
 
-
 function getCacheInstance() {
     if (Cache.instance){
         return Cache.instance;
@@ -49,7 +48,32 @@ function getCacheInstance() {
     return Cache.instance;
 }
 
+/**
+ * Caches api calls responses (assumes usage of axios)
+ * Usage:
+ *   const result = await cachedApiCall(functionThatUsesAxios, 20)(paramA, paramB, ...) // cache result for 20 minutes
+ * @param {function} fn - The function to cache
+ * @param {number} cacheTime - in minutes 
+ * @returns 
+ */
+function cachedApiCall(fn, cacheTime) {
+    const cache = getCacheInstance();
+    return async function() {
+        let cacheKey = `${fn.name}_${Object.values(arguments).join('_')}`;
+        const cachedData = await cache.cacheGet(cacheKey);
+        if (cachedData) {
+            console.log(`fetched from cache for ${cacheKey}`);
+            return cachedData;
+        } else {
+            let result = await fn.apply(this, arguments);
+            await cache.cacheSet(cacheKey, result.data, cacheTime);
+            return result.data;
+        }
+    }
+  }
+
 module.exports = {
     Cache,
-    getCacheInstance
+    getCacheInstance,
+    cachedApiCall,
 }
