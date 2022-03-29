@@ -53,7 +53,11 @@ module.exports = class KahootService {
     const questionsRes = []
     for(const body in bodies) {
       // eslint-disable-next-line no-await-in-loop
-      const questionRes = await this.kahootRepository.createQuestion(triviaId, bodies[body].question, bodies[body].answers);
+      const questionRes = await this.kahootRepository.createQuestion(
+        triviaId,
+        bodies[body].question,
+        bodies[body].answers
+      );
       questionsRes.push(questionRes)
     }
     return questionsRes;
@@ -187,11 +191,18 @@ module.exports = class KahootService {
       const playerAnswer = trivia.questions[counter].answers.find(
         (answer) => answer.id === answerId
       );
+
       namespace.miniPodium.find((option) => option.option === playerAnswer.id).count++;
       if (playerAnswer.isCorrect) {
         socket.score += namespace.timer;
       }
-
+      const { description = '' } = trivia.questions[counter].answers
+        .find(({isCorrect}) => isCorrect)
+      socket.emit('answer-check', {
+        playerId: socket.playerId,
+        ...playerAnswer,
+        correctDescription: description
+      });
       await this.kahootRepository.savePlayerAnswer({
         playerId: socket.playerId,
         answerId: playerAnswer.id,
