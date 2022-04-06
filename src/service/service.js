@@ -2,7 +2,7 @@
 /* eslint-disable no-plusplus */
 /* eslint-disable no-param-reassign */
 
-const { getContactsCached, getSession } = require('../lib/bizzaboClient');
+const { getContact, getSession } = require('../lib/bizzaboClient');
 const ClientError = require("../entity/ClientError");
 
 module.exports = class KahootService {
@@ -214,12 +214,9 @@ module.exports = class KahootService {
   async getPlayer(accountId, eventId, email) {
     if (accountId && eventId && email) {
       try {
-        const contactsData = await getContactsCached(parseInt(accountId), parseInt(eventId));
-
-        const contactsWithProps = contactsData.map(contact => ({ id: contact.id, eventId: contact.eventId, ...contact.properties }));
-        const currentUser = contactsWithProps.filter(contact => contact.email === email).pop();
+        const currentUser = await getContact(parseInt(accountId), parseInt(eventId), email);
         if (currentUser) {
-          return { playerName: `${currentUser.firstName} ${currentUser.lastName}`};
+          return { playerName: `${currentUser.properties.firstName} ${currentUser.properties.lastName}`};
         }
       } catch (error) {
         // do nothing
