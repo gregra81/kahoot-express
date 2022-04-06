@@ -41,13 +41,58 @@ const getToken = async (accountId) => {
     }
 }
 
-const getContacts = async (accountId, eventId) => {
+const getContactsPaginated = async (accountId, eventId, page) => {
+    const { data } = await axios.get(`${apiServer}/v1/events/${eventId}/contacts`, {
+      params: {
+        size: 200,
+        page,
+      },
+      headers: {
+        Authorization: `Bearer ${await getToken(accountId)}`,
+      },
+    });
+  
+    return { pagination: data.page, contacts: data.content };
+}
 
-    return await axios.get(`${apiServer}/v1/events/${eventId}/contacts?size=200`, {
-        headers : {
-            'Authorization': `Bearer ${await getToken(accountId)}`
-        } 
-    }); 
+/**
+ * Return paginated contacts and cache it so for the next calls we're getting
+ * cached data instead of hitting the Bizzabo APIs
+ * @param {*} accountId 
+ * @param {*} eventId 
+ * @param {*} cacheTime - in minutes
+ * @returns 
+ */
+const getPaginatedContactsCached = async (accountId, eventId, page, cacheTime = 10) => {
+    const cachedContactsFunc = cachedApiCall(getContactsPaginated, cacheTime);
+    const data = await cachedContactsFunc(accountId, eventId, page);
+    return data;
+}
+
+/** PUBLIC METHODS **/
+
+ const getContact = async (accountId, eventId, email) => {
+    let contact = undefined;
+    let currentPage = 0;
+  
+    while (true) {
+      currentPage += 1;
+  
+      const { pagination, contacts } = await getPaginatedContactsCached(
+        accountId,
+        eventId,
+        currentPage
+      );
+  
+        if (contacts) { 
+            contact = contacts.find((c) => c.properties.email === email);
+            if (contact !== undefined || pagination.totalPages === currentPage) {
+                break;
+            }
+        }
+    }
+  
+    return contact;
 }
 
 const getSession = async (accountId, eventId, sessionId) => {
@@ -58,24 +103,7 @@ const getSession = async (accountId, eventId, sessionId) => {
     });
 }
 
-/** PUBLIC METHODS **/
-/**
- * Reyturn contacts and cache them so for the next calls we're getting
- * cached data instead of hitting the Bizzabo APIs
- * @param {*} accountId 
- * @param {*} eventId 
- * @param {*} cacheTime - in minutes
- * @returns 
- */
-const getContactsCached = async (accountId, eventId, cacheTime = 10) => {
-    const cachedContactsFunc = cachedApiCall(getContacts, cacheTime);
-    const data = await cachedContactsFunc(accountId, eventId);
-
-    return data.content;
-}
-
-
 module.exports = {
-    getContactsCached,
+    getContact,
     getSession
 }

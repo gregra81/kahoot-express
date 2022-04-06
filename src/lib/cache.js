@@ -66,8 +66,8 @@ function cachedApiCall(fn, cacheTime) {
             return cachedData;
         } else {
             let result = await fn.apply(this, arguments);
-            await cache.cacheSet(cacheKey, result.data, cacheTime);
-            return result.data;
+            await cache.cacheSet(cacheKey, result, cacheTime);
+            return result;
         }
     }
   }
