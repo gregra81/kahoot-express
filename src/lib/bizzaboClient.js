@@ -78,17 +78,15 @@ const getPaginatedContactsCached = async (accountId, eventId, page, cacheTime = 
     while (true) {
       currentPage += 1;
   
-      const { pagination, contacts } = await getPaginatedContactsCached(
-        accountId,
-        eventId,
-        currentPage
-      );
+        const { pagination, contacts } = await getPaginatedContactsCached(
+            accountId,
+            eventId,
+            currentPage
+        );
   
-        if (contacts) { 
-            contact = contacts.find((c) => c.properties.email === email);
-            if (contact !== undefined || pagination.totalPages === currentPage) {
-                break;
-            }
+        contact = contacts ? contacts.find((c) => c.properties.email === email) : undefined;
+        if (contact !== undefined || pagination.totalPages === currentPage) {
+            break;
         }
     }
   
