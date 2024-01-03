@@ -4,6 +4,7 @@ const KahootRepository = require('./repository/repository');
 
 function initKahootModule(app, io, container) {
   const kahootController = container.get('KahootController');
+  console.log('test');
   kahootController.configureRoutes(app, io);
 }
 
